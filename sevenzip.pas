@@ -1030,13 +1030,20 @@ begin
 end;
 
 procedure T7zInArchive.OpenFile(const filename: string); stdcall;
+var
+  strm: IInStream;
 begin
-  RINOK(
-    InArchive.Open(
-      T7zStream.Create(TFileStream.Create(filename, fmOpenRead or fmShareDenyNone), soOwned),
-        @MAXCHECK, self as IArchiveOpenCallBack
-      )
-    );
+  strm := T7zStream.Create(TFileStream.Create(filename, fmOpenRead or fmShareDenyNone), soOwned);
+  try
+    RINOK(
+      InArchive.Open(
+        strm,
+          @MAXCHECK, self as IArchiveOpenCallBack
+        )
+      );
+  finally
+    strm := nil;
+  end;
 end;
 
 procedure T7zInArchive.OpenStream(stream: IInStream); stdcall;
@@ -1594,8 +1601,15 @@ begin
 end;
 
 procedure T7zOutArchive.SaveToStream(stream: TStream);
+var
+  strm: ISequentialOutStream;
 begin
-  RINOK(OutArchive.UpdateItems(T7zStream.Create(stream), FBatchList.Count, self as IArchiveUpdateCallback))
+  strm := T7zStream.Create(stream);
+  try
+    RINOK(OutArchive.UpdateItems(strm, FBatchList.Count, self as IArchiveUpdateCallback));
+  finally
+    strm := nil;
+  end;
 end;
 
 function T7zOutArchive.SetCompleted(completeValue: PInt64): HRESULT;
