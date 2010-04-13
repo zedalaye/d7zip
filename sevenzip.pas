@@ -1336,7 +1336,7 @@ end;
 function T7zStream.Seek(offset: Int64; seekOrigin: Cardinal;
   newPosition: PInt64): HRESULT;
 begin
-  FStream.Seek(offset, seekOrigin);
+  FStream.Seek(offset, TSeekOrigin(seekOrigin));
   if newPosition <> nil then
     newPosition^ := FStream.Position;
   Result := S_OK;
