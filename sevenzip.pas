@@ -10,7 +10,7 @@
 (* the specific language governing rights and limitations under the License.    *)
 (*                                                                              *)
 (* Unit owner : Henri Gourvest <hgourvest@progdigy.com>                         *)
-(* V1.1                                                                         *)
+(* V1.2                                                                         *)
 (********************************************************************************)
 
 unit sevenzip;
@@ -451,7 +451,9 @@ CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
     kEncoder,
     kInStreams,
     kOutStreams,
-    kDescription
+    kDescription,
+    kDecoderIsAssigned,
+    kEncoderIsAssigned
   );
 
 //******************************************************************************
@@ -569,36 +571,35 @@ type
   function CreateOutArchive(const classid: TGUID): I7zOutArchive;
 
 const
-  CLSID_CFormatZip      : TGUID = '{23170F69-40C1-278A-1000-000110010000}';
-  CLSID_CFormatBZ2      : TGUID = '{23170F69-40C1-278A-1000-000110020000}';
-  CLSID_CFormatRar      : TGUID = '{23170F69-40C1-278A-1000-000110030000}';
-  CLSID_CFormatArj      : TGUID = '{23170F69-40C1-278A-1000-000110040000}';
-  CLSID_CFormatZ        : TGUID = '{23170F69-40C1-278A-1000-000110050000}';
-  CLSID_CFormatLzh      : TGUID = '{23170F69-40C1-278A-1000-000110060000}';
-  CLSID_CFormat7z       : TGUID = '{23170F69-40C1-278A-1000-000110070000}';
-  CLSID_CFormatCab      : TGUID = '{23170F69-40C1-278A-1000-000110080000}';
+  CLSID_CFormatZip      : TGUID = '{23170F69-40C1-278A-1000-000110010000}'; // zip jar xpi
+  CLSID_CFormatBZ2      : TGUID = '{23170F69-40C1-278A-1000-000110020000}'; // bz2 bzip2 tbz2 tbz
+  CLSID_CFormatRar      : TGUID = '{23170F69-40C1-278A-1000-000110030000}'; // rar r00
+  CLSID_CFormatArj      : TGUID = '{23170F69-40C1-278A-1000-000110040000}'; // arj
+  CLSID_CFormatZ        : TGUID = '{23170F69-40C1-278A-1000-000110050000}'; // z taz
+  CLSID_CFormatLzh      : TGUID = '{23170F69-40C1-278A-1000-000110060000}'; // lzh lha
+  CLSID_CFormat7z       : TGUID = '{23170F69-40C1-278A-1000-000110070000}'; // 7z
+  CLSID_CFormatCab      : TGUID = '{23170F69-40C1-278A-1000-000110080000}'; // cab
   CLSID_CFormatNsis     : TGUID = '{23170F69-40C1-278A-1000-000110090000}';
-  CLSID_CFormatLzma     : TGUID = '{23170F69-40C1-278A-1000-0001100A0000}';
+  CLSID_CFormatLzma     : TGUID = '{23170F69-40C1-278A-1000-0001100A0000}'; // lzma lzma86
   CLSID_CFormatPe       : TGUID = '{23170F69-40C1-278A-1000-000110DD0000}';
   CLSID_CFormatElf      : TGUID = '{23170F69-40C1-278A-1000-000110DE0000}';
   CLSID_CFormatMacho    : TGUID = '{23170F69-40C1-278A-1000-000110DF0000}';
-  CLSID_CFormatUdf      : TGUID = '{23170F69-40C1-278A-1000-000110E00000}';
-  CLSID_CFormatXar      : TGUID = '{23170F69-40C1-278A-1000-000110E10000}';
+  CLSID_CFormatUdf      : TGUID = '{23170F69-40C1-278A-1000-000110E00000}'; // iso
+  CLSID_CFormatXar      : TGUID = '{23170F69-40C1-278A-1000-000110E10000}'; // xar
   CLSID_CFormatMub      : TGUID = '{23170F69-40C1-278A-1000-000110E20000}';
   CLSID_CFormatHfs      : TGUID = '{23170F69-40C1-278A-1000-000110E30000}';
-  CLSID_CFormatDmg      : TGUID = '{23170F69-40C1-278A-1000-000110E40000}';
-  CLSID_CFormatCompound : TGUID = '{23170F69-40C1-278A-1000-000110E50000}';
-  CLSID_CFormatWim      : TGUID = '{23170F69-40C1-278A-1000-000110E60000}';
-  CLSID_CFormatIso      : TGUID = '{23170F69-40C1-278A-1000-000110E70000}';
+  CLSID_CFormatDmg      : TGUID = '{23170F69-40C1-278A-1000-000110E40000}'; // dmg
+  CLSID_CFormatCompound : TGUID = '{23170F69-40C1-278A-1000-000110E50000}'; // msi doc xls ppt
+  CLSID_CFormatWim      : TGUID = '{23170F69-40C1-278A-1000-000110E60000}'; // wim swm
+  CLSID_CFormatIso      : TGUID = '{23170F69-40C1-278A-1000-000110E70000}'; // iso
   CLSID_CFormatBkf      : TGUID = '{23170F69-40C1-278A-1000-000110E80000}';
-  CLSID_CFormatChm      : TGUID = '{23170F69-40C1-278A-1000-000110E90000}';
-  CLSID_CFormatSplit    : TGUID = '{23170F69-40C1-278A-1000-000110EA0000}';
-  CLSID_CFormatRpm      : TGUID = '{23170F69-40C1-278A-1000-000110EB0000}';
-  CLSID_CFormatDeb      : TGUID = '{23170F69-40C1-278A-1000-000110EC0000}';
-  CLSID_CFormatCpio     : TGUID = '{23170F69-40C1-278A-1000-000110ED0000}';
-  CLSID_CFormatTar      : TGUID = '{23170F69-40C1-278A-1000-000110EE0000}';
-  CLSID_CFormatGZip     : TGUID = '{23170F69-40C1-278A-1000-000110EF0000}';
-
+  CLSID_CFormatChm      : TGUID = '{23170F69-40C1-278A-1000-000110E90000}'; // chm chi chq chw hxs hxi hxr hxq hxw lit
+  CLSID_CFormatSplit    : TGUID = '{23170F69-40C1-278A-1000-000110EA0000}'; // 001
+  CLSID_CFormatRpm      : TGUID = '{23170F69-40C1-278A-1000-000110EB0000}'; // rpm
+  CLSID_CFormatDeb      : TGUID = '{23170F69-40C1-278A-1000-000110EC0000}'; // deb
+  CLSID_CFormatCpio     : TGUID = '{23170F69-40C1-278A-1000-000110ED0000}'; // cpio
+  CLSID_CFormatTar      : TGUID = '{23170F69-40C1-278A-1000-000110EE0000}'; // tar
+  CLSID_CFormatGZip     : TGUID = '{23170F69-40C1-278A-1000-000110EF0000}'; // gz gzip tgz tpz
 
 implementation
 
