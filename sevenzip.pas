@@ -9,7 +9,7 @@
 (* WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for *)
 (* the specific language governing rights and limitations under the License.    *)
 (*                                                                              *)
-(* Unit owner : Henri Gourvest <hgourvest@progdigy.com>                         *)
+(* Unit owner : Henri Gourvest <hgourvest@gmail.com>                            *)
 (* V1.2                                                                         *)
 (********************************************************************************)
 
@@ -75,7 +75,7 @@ const
   kpidLinks            = 37; // VT_UI4
   kpidNumBlocks        = 38; // VT_UI4
   kpidNumVolumes       = 39; // VT_UI4
-  kpidTimeType         = 40; //
+  kpidTimeType         = 40; // VT_UI4
   kpidBit64            = 41; // VT_BOOL
   kpidBigEndian        = 42; // VT_BOOL
   kpidCpu              = 43; // VT_BSTR
@@ -653,7 +653,6 @@ begin
     false: arch.SetPropertie(name, 'OFF');
   end;
 end;
-
 
 procedure SetCompressionLevel(Arch: I7zOutArchive; level: Cardinal);
 begin
@@ -1657,3 +1656,13 @@ begin
 end;
 
 end.
+
+
+
+
+
+
+
+
+
+
