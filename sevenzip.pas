@@ -567,8 +567,8 @@ type
 
   // constructors
 
-  function CreateInArchive(const classid: TGUID): I7zInArchive;
-  function CreateOutArchive(const classid: TGUID): I7zOutArchive;
+  function CreateInArchive(const classid: TGUID; const lib: string = '7z.dll'): I7zInArchive;
+  function CreateOutArchive(const classid: TGUID; const lib: string = '7z.dll'): I7zOutArchive;
 
 const
   CLSID_CFormatZip      : TGUID = '{23170F69-40C1-278A-1000-000110010000}'; // zip jar xpi
@@ -882,15 +882,15 @@ type
     property OutArchive: IOutArchive read GetOutArchive;
   end;
 
-function CreateInArchive(const classid: TGUID): I7zInArchive;
+function CreateInArchive(const classid: TGUID; const lib: string): I7zInArchive;
 begin
-  Result := T7zInArchive.Create('7z.dll');
+  Result := T7zInArchive.Create(lib);
   Result.ClassId := classid;
 end;
 
-function CreateOutArchive(const classid: TGUID): I7zOutArchive;
+function CreateOutArchive(const classid: TGUID; const lib: string): I7zOutArchive;
 begin
-  Result := T7zOutArchive.Create('7z.dll');
+  Result := T7zOutArchive.Create(lib);
   Result.ClassId := classid;
 end;
 
