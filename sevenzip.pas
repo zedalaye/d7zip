@@ -538,20 +538,24 @@ CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
 
   // I7zOutArchive property setters
 type
-  TZipCompressionMethod = (mzCopy, mzDeflate, mzDeflate64, mzBZip2);
+  TZipCompressionMethod = (mzCopy, mzDeflate, mzDeflate64, mzBZip2, mzLZMA, mzPPMD);
+  TZipEncryptionMethod = (emAES128, emAES192, emAES256, emZIPCRYPTO);
   T7zCompressionMethod = (m7Copy, m7LZMA, m7BZip2, m7PPMd, m7Deflate, m7Deflate64);
                                                                                               //  ZIP 7z GZIP BZ2
   procedure SetCompressionLevel(Arch: I7zOutArchive; level: Cardinal);                        //   X   X   X   X
   procedure SetMultiThreading(Arch: I7zOutArchive; ThreadCount: Cardinal);                    //   X   X       X
 
   procedure SetCompressionMethod(Arch: I7zOutArchive; method: TZipCompressionMethod);         //   X
+  procedure SetEncryptionMethod(Arch: I7zOutArchive; method: TZipEncryptionMethod);           //   X
   procedure SetDictionnarySize(Arch: I7zOutArchive; size: Cardinal); // < 32                  //   X           X
+  procedure SetMemorySize(Arch: I7zOutArchive; size: Cardinal);                               //   X
   procedure SetDeflateNumPasses(Arch: I7zOutArchive; pass: Cardinal);                         //   X       X   X
   procedure SetNumFastBytes(Arch: I7zOutArchive; fb: Cardinal);                               //   X       X
   procedure SetNumMatchFinderCycles(Arch: I7zOutArchive; mc: Cardinal);                       //   X       X
 
+
   procedure SevenZipSetCompressionMethod(Arch: I7zOutArchive; method: T7zCompressionMethod);  //       X
-  procedure SevenZipSetBindInfo(Arch: I7zOutArchive; const bind: UnicodeString);                 //       X
+  procedure SevenZipSetBindInfo(Arch: I7zOutArchive; const bind: UnicodeString);              //       X
   procedure SevenZipSetSolidSettings(Arch: I7zOutArchive; solid: boolean);                    //       X
   procedure SevenZipRemoveSfxBlock(Arch: I7zOutArchive; remove: boolean);                     //       X
   procedure SevenZipAutoFilter(Arch: I7zOutArchive; auto: boolean);                           //       X
@@ -580,7 +584,22 @@ const
   CLSID_CFormat7z       : TGUID = '{23170F69-40C1-278A-1000-000110070000}'; // 7z
   CLSID_CFormatCab      : TGUID = '{23170F69-40C1-278A-1000-000110080000}'; // cab
   CLSID_CFormatNsis     : TGUID = '{23170F69-40C1-278A-1000-000110090000}';
-  CLSID_CFormatLzma     : TGUID = '{23170F69-40C1-278A-1000-0001100A0000}'; // lzma lzma86
+  CLSID_CFormatLzma     : TGUID = '{23170F69-40C1-278A-1000-0001100A0000}'; // lzma
+  CLSID_CFormatLzma86   : TGUID = '{23170F69-40C1-278A-1000-0001100B0000}'; // lzma 86
+  CLSID_CFormatXz       : TGUID = '{23170F69-40C1-278A-1000-0001100C0000}'; // xz
+  CLSID_CFormatPpmd     : TGUID = '{23170F69-40C1-278A-1000-0001100D0000}'; // ppmd
+
+  CLSID_CFormatSquashFS : TGUID = '{23170F69-40C1-278A-1000-000110D20000}';
+  CLSID_CFormatCramFS   : TGUID = '{23170F69-40C1-278A-1000-000110D30000}';
+  CLSID_CFormatAPM      : TGUID = '{23170F69-40C1-278A-1000-000110D40000}';
+  CLSID_CFormatMslz     : TGUID = '{23170F69-40C1-278A-1000-000110D50000}';
+  CLSID_CFormatFlv      : TGUID = '{23170F69-40C1-278A-1000-000110D60000}';
+  CLSID_CFormatSwf      : TGUID = '{23170F69-40C1-278A-1000-000110D70000}';
+  CLSID_CFormatSwfc     : TGUID = '{23170F69-40C1-278A-1000-000110D80000}';
+  CLSID_CFormatNtfs     : TGUID = '{23170F69-40C1-278A-1000-000110D90000}';
+  CLSID_CFormatFat      : TGUID = '{23170F69-40C1-278A-1000-000110DA0000}';
+  CLSID_CFormatMbr      : TGUID = '{23170F69-40C1-278A-1000-000110DB0000}';
+  CLSID_CFormatVhd      : TGUID = '{23170F69-40C1-278A-1000-000110DC0000}';
   CLSID_CFormatPe       : TGUID = '{23170F69-40C1-278A-1000-000110DD0000}';
   CLSID_CFormatElf      : TGUID = '{23170F69-40C1-278A-1000-000110DE0000}';
   CLSID_CFormatMacho    : TGUID = '{23170F69-40C1-278A-1000-000110DF0000}';
@@ -605,7 +624,8 @@ implementation
 
 const
   MAXCHECK : int64 = (1 shl 20);
-  ZipCompressionMethod: array[TZipCompressionMethod] of UnicodeString = ('COPY', 'DEFLATE', 'DEFLATE64', 'BZIP2');
+  ZipCompressionMethod: array[TZipCompressionMethod] of UnicodeString = ('COPY', 'DEFLATE', 'DEFLATE64', 'BZIP2', 'LZMA', 'PPMD');
+  ZipEncryptionMethod: array[TZipEncryptionMethod] of UnicodeString = ('AES128', 'AES192', 'AES256', 'ZIPCRYPTO');
   SevCompressionMethod: array[T7zCompressionMethod] of UnicodeString = ('COPY', 'LZMA', 'BZIP2', 'PPMD', 'DEFLATE', 'DEFLATE64');
 
 function DateTimeToFileTime(dt: TDateTime): TFileTime;
@@ -669,9 +689,19 @@ begin
   Arch.SetPropertie('M', ZipCompressionMethod[method]);
 end;
 
+procedure SetEncryptionMethod(Arch: I7zOutArchive; method: TZipEncryptionMethod);
+begin
+  Arch.SetPropertie('EM', ZipEncryptionMethod[method]);
+end;
+
 procedure SetDictionnarySize(Arch: I7zOutArchive; size: Cardinal);
 begin
   SetCardinalProperty(arch, 'D', size);
+end;
+
+procedure SetMemorySize(Arch: I7zOutArchive; size: Cardinal);
+begin
+  SetCardinalProperty(arch, 'MEM', size);
 end;
 
 procedure SetDeflateNumPasses(Arch: I7zOutArchive; pass: Cardinal);
@@ -706,17 +736,17 @@ end;
 
 procedure SevenZipRemoveSfxBlock(Arch: I7zOutArchive; remove: boolean);
 begin
-  SetBooleanProperty(arch, 'RSFX', remove);
+  SetBooleanProperty(Arch, 'RSFX', remove);
 end;
 
 procedure SevenZipAutoFilter(Arch: I7zOutArchive; auto: boolean);
 begin
-  SetBooleanProperty(arch, 'F', auto);
+  SetBooleanProperty(Arch, 'F', auto);
 end;
 
 procedure SevenZipCompressHeaders(Arch: I7zOutArchive; compress: boolean);
 begin
-  SetBooleanProperty(arch, 'HC', compress);
+  SetBooleanProperty(Arch, 'HC', compress);
 end;
 
 procedure SevenZipCompressHeadersFull(Arch: I7zOutArchive; compress: boolean);
