@@ -501,11 +501,11 @@ CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
       CreationTime, LastWriteTime: TFileTime; const Path: UnicodeString;
       IsFolder, IsAnti: boolean); stdcall;
     procedure AddFile(const Filename: TFileName; const Path: UnicodeString); stdcall;
-    procedure AddFiles(const Dir, Path, Willcards: string; recurse: boolean); stdcall;
+    procedure AddFiles(const Dir, Path, Wildcard: string; recurse: boolean); stdcall;
     procedure SaveToFile(const FileName: TFileName); stdcall;
     procedure SaveToStream(stream: TStream); stdcall;
     procedure SetProgressCallback(sender: Pointer; callback: T7zProgressCallback); stdcall;
-    procedure CrearBatch; stdcall;
+    procedure ClearBatch; stdcall;
     procedure SetPassword(const password: UnicodeString); stdcall;
     procedure SetPropertie(name: UnicodeString; value: OleVariant); stdcall;
     procedure SetClassId(const classid: TGUID);
@@ -885,11 +885,11 @@ type
       Attributes: Cardinal; CreationTime, LastWriteTime: TFileTime;
       const Path: UnicodeString; IsFolder, IsAnti: boolean); stdcall;
     procedure AddFile(const Filename: TFileName; const Path: UnicodeString); stdcall;
-    procedure AddFiles(const Dir, Path, Willcards: string; recurse: boolean); stdcall;
+    procedure AddFiles(const Dir, Path, Wildcard: string; recurse: boolean); stdcall;
     procedure SaveToFile(const FileName: TFileName); stdcall;
     procedure SaveToStream(stream: TStream); stdcall;
     procedure SetProgressCallback(sender: Pointer; callback: T7zProgressCallback); stdcall;
-    procedure CrearBatch; stdcall;
+    procedure ClearBatch; stdcall;
     procedure SetPassword(const password: UnicodeString); stdcall;
     procedure SetPropertie(name: UnicodeString; value: OleVariant); stdcall;
     // IProgress
@@ -1436,7 +1436,7 @@ begin
   FBatchList.Add(item);
 end;
 
-procedure T7zOutArchive.AddFiles(const Dir, Path, Willcards: string; recurse: boolean);
+procedure T7zOutArchive.AddFiles(const Dir, Path, Wildcard: string; recurse: boolean);
 var
   lencut: integer;
   willlist: TStringList;
@@ -1484,7 +1484,7 @@ begin
   willlist := TStringList.Create;
   try
     willlist.Delimiter := ';';
-    willlist.DelimitedText := Willcards;
+    willlist.DelimitedText := Wildcard;
     zedir := IncludeTrailingPathDelimiter(Dir);
     lencut := Length(zedir) + 1;
     Traverse(zedir);
@@ -1513,7 +1513,7 @@ begin
   FBatchList.Add(item);
 end;
 
-procedure T7zOutArchive.CrearBatch;
+procedure T7zOutArchive.ClearBatch;
 begin
   FBatchList.Clear;
 end;
