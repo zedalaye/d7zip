@@ -35,64 +35,110 @@ type
 //******************************************************************************
 
 const
-  kpidNoProperty       = 0;
+  kpidNoProperty            = 0;
+  kpidMainSubfile           = 1;
+  kpidHandlerItemIndex      = 2;
+  kpidPath                  = 3;  // VT_BSTR
+  kpidName                  = 4;  // VT_BSTR
+  kpidExtension             = 5;  // VT_BSTR
+  kpidIsDir                 = 6;  // VT_BOOL
+  kpidSize                  = 7;  // VT_UI8
+  kpidPackSize              = 8;  // VT_UI8
+  kpidAttrib                = 9;  // VT_UI4
+  kpidCTime                 = 10; // VT_FILETIME
+  kpidATime                 = 11; // VT_FILETIME
+  kpidMTime                 = 12; // VT_FILETIME
+  kpidSolid                 = 13; // VT_BOOL
+  kpidCommented             = 14; // VT_BOOL
+  kpidEncrypted             = 15; // VT_BOOL
+  kpidSplitBefore           = 16; // VT_BOOL
+  kpidSplitAfter            = 17; // VT_BOOL
+  kpidDictionarySize        = 18; // VT_UI4
+  kpidCRC                   = 19; // VT_UI4
+  kpidType                  = 20; // VT_BSTR
+  kpidIsAnti                = 21; // VT_BOOL
+  kpidMethod                = 22; // VT_BSTR
+  kpidHostOS                = 23; // VT_BSTR
+  kpidFileSystem            = 24; // VT_BSTR
+  kpidUser                  = 25; // VT_BSTR
+  kpidGroup                 = 26; // VT_BSTR
+  kpidBlock                 = 27; // VT_UI4
+  kpidComment               = 28; // VT_BSTR
+  kpidPosition              = 29; // VT_UI4
+  kpidPrefix                = 30; // VT_BSTR
+  kpidNumSubDirs            = 31; // VT_UI4
+  kpidNumSubFiles           = 32; // VT_UI4
+  kpidUnpackVer             = 33; // VT_UI1
+  kpidVolume                = 34; // VT_UI4
+  kpidIsVolume              = 35; // VT_BOOL
+  kpidOffset                = 36; // VT_UI8
+  kpidLinks                 = 37; // VT_UI4
+  kpidNumBlocks             = 38; // VT_UI4
+  kpidNumVolumes            = 39; // VT_UI4
+  kpidTimeType              = 40; // VT_UI4
+  kpidBit64                 = 41; // VT_BOOL
+  kpidBigEndian             = 42; // VT_BOOL
+  kpidCpu                   = 43; // VT_BSTR
+  kpidPhySize               = 44; // VT_UI8
+  kpidHeadersSize           = 45; // VT_UI8
+  kpidChecksum              = 46; // VT_UI4
+  kpidCharacts              = 47; // VT_BSTR
+  kpidVa                    = 48; // VT_UI8
+  kpidId                    = 49;
+  kpidShortName             = 50;
+  kpidCreatorApp            = 51;
+  kpidSectorSize            = 52;
+  kpidPosixAttrib           = 53;
+  kpidSymLink               = 54;
+  kpidError                 = 55;
+  kpidTotalSize             = 56;
+  kpidFreeSpace             = 57;
+  kpidClusterSize           = 58;
+  kpidVolumeName            = 59;
+  kpidLocalName             = 60;
+  kpidProvider              = 61;
+  kpidNtSecure              = 62;
+  kpidIsAltStream           = 63;
+  kpidIsAux                 = 64;
+  kpidIsDeleted             = 65;
+  kpidIsTree                = 66;
+  kpidSha1                  = 67;
+  kpidSha256                = 68;
+  kpidErrorType             = 69;
+  kpidNumErrors             = 70;
+  kpidErrorFlags            = 71;
+  kpidWarningFlags          = 72;
+  kpidWarning               = 73;
+  kpidNumStreams            = 74;
+  kpidNumAltStreams         = 75;
+  kpidAltStreamsSize        = 76;
+  kpidVirtualSize           = 77;
+  kpidUnpackSize            = 78;
+  kpidTotalPhySize          = 79;
+  kpidVolumeIndex           = 80;
+  kpidSubType               = 81;
+  kpidShortComment          = 82;
+  kpidCodePage              = 83;
+  kpidIsNotArcType          = 84;
+  kpidPhySizeCantBeDetected = 85;
+  kpidZerosTailIsAllowed    = 86;
+  kpidTailSize              = 87;
+  kpidEmbeddedStubSize      = 88;
+  kpidNtReparse             = 89;
+  kpidHardLink              = 90;
+  kpidINode                 = 91;
+  kpidStreamId              = 92;
+  kpidReadOnly              = 93;
+  kpidOutName               = 94;
+  kpidCopyLink              = 95;
 
-  kpidHandlerItemIndex = 2;
-  kpidPath             = 3;  // VT_BSTR
-  kpidName             = 4;  // VT_BSTR
-  kpidExtension        = 5;  // VT_BSTR
-  kpidIsFolder         = 6;  // VT_BOOL
-  kpidSize             = 7;  // VT_UI8
-  kpidPackedSize       = 8;  // VT_UI8
-  kpidAttributes       = 9;  // VT_UI4
-  kpidCreationTime     = 10; // VT_FILETIME
-  kpidLastAccessTime   = 11; // VT_FILETIME
-  kpidLastWriteTime    = 12; // VT_FILETIME
-  kpidSolid            = 13; // VT_BOOL
-  kpidCommented        = 14; // VT_BOOL
-  kpidEncrypted        = 15; // VT_BOOL
-  kpidSplitBefore      = 16; // VT_BOOL
-  kpidSplitAfter       = 17; // VT_BOOL
-  kpidDictionarySize   = 18; // VT_UI4
-  kpidCRC              = 19; // VT_UI4
-  kpidType             = 20; // VT_BSTR
-  kpidIsAnti           = 21; // VT_BOOL
-  kpidMethod           = 22; // VT_BSTR
-  kpidHostOS           = 23; // VT_BSTR
-  kpidFileSystem       = 24; // VT_BSTR
-  kpidUser             = 25; // VT_BSTR
-  kpidGroup            = 26; // VT_BSTR
-  kpidBlock            = 27; // VT_UI4
-  kpidComment          = 28; // VT_BSTR
-  kpidPosition         = 29; // VT_UI4
-  kpidPrefix           = 30; // VT_BSTR
-  kpidNumSubDirs       = 31; // VT_UI4
-  kpidNumSubFiles      = 32; // VT_UI4
-  kpidUnpackVer        = 33; // VT_UI1
-  kpidVolume           = 34; // VT_UI4
-  kpidIsVolume         = 35; // VT_BOOL
-  kpidOffset           = 36; // VT_UI8
-  kpidLinks            = 37; // VT_UI4
-  kpidNumBlocks        = 38; // VT_UI4
-  kpidNumVolumes       = 39; // VT_UI4
-  kpidTimeType         = 40; // VT_UI4
-  kpidBit64            = 41; // VT_BOOL
-  kpidBigEndian        = 42; // VT_BOOL
-  kpidCpu              = 43; // VT_BSTR
-  kpidPhySize          = 44; // VT_UI8
-  kpidHeadersSize      = 45; // VT_UI8
-  kpidChecksum         = 46; // VT_UI4
-  kpidCharacts         = 47; // VT_BSTR
-  kpidVa               = 48; // VT_UI8
-
-
-  kpidTotalSize        = $1100; // VT_UI8
-  kpidFreeSpace        = kpidTotalSize + 1; // VT_UI8
-  kpidClusterSize      = kpidFreeSpace + 1; // VT_UI8
-  kpidVolumeName       = kpidClusterSize + 1; // VT_BSTR
-
-  kpidLocalName        = $1200; // VT_BSTR
-  kpidProvider         = kpidLocalName + 1; // VT_BSTR
+//  kpidTotalSize        = $1100; // VT_UI8
+//  kpidFreeSpace        = kpidTotalSize + 1; // VT_UI8
+//  kpidClusterSize      = kpidFreeSpace + 1; // VT_UI8
+//  kpidVolumeName       = kpidClusterSize + 1; // VT_BSTR
+//
+//  kpidLocalName        = $1200; // VT_BSTR
+//  kpidProvider         = kpidLocalName + 1; // VT_BSTR
 
   kpidUserDefined      = $10000;
 
@@ -129,12 +175,28 @@ type
   ['{23170F69-40C1-278A-0000-000300010000}']
     function Read(data: Pointer; size: Cardinal; processedSize: PCardinal): HRESULT; stdcall;
     (*
-    Out: if size != 0, return_value = S_OK and (*processedSize == 0),
-      then there are no more bytes in stream.
-    if (size > 0) && there are bytes in stream,
-    this function must read at least 1 byte.
-    This function is allowed to read less than number of remaining bytes in stream.
-    You must call Read function in loop, if you need exact amount of data
+    The requirement for caller: (processedSize != NULL).
+    The callee can allow (processedSize == NULL) for compatibility reasons.
+
+    if (size == 0), this function returns S_OK and (*processedSize) is set to 0.
+
+    if (size != 0)
+    {
+      Partial read is allowed: (*processedSize <= avail_size && *processedSize <= size),
+        where (avail_size) is the size of remaining bytes in stream.
+      If (avail_size != 0), this function must read at least 1 byte: (*processedSize > 0).
+      You must call Read() in loop, if you need to read exact amount of data.
+    }
+
+    If seek pointer before Read() call was changed to position past the end of stream:
+      if (seek_pointer >= stream_size), this function returns S_OK and (*processedSize) is set to 0.
+
+    ERROR CASES:
+      If the function returns error code, then (*processedSize) is size of
+      data written to (data) buffer (it can be data before error or data with errors).
+      The recommended way for callee to work with reading errors:
+        1) write part of data before error to (data) buffer and return S_OK.
+        2) return error code for further calls of Read().
     *)
   end;
 
@@ -142,9 +204,19 @@ type
   ['{23170F69-40C1-278A-0000-000300020000}']
     function Write(data: Pointer; size: Cardinal; processedSize: PCardinal): HRESULT; stdcall;
     (*
-    if (size > 0) this function must write at least 1 byte.
-    This function is allowed to write less than "size".
-    You must call Write function in loop, if you need to write exact amount of data
+    The requirement for caller: (processedSize != NULL).
+    The callee can allow (processedSize == NULL) for compatibility reasons.
+
+    if (size != 0)
+    {
+      Partial write is allowed: (*processedSize <= size),
+      but this function must write at least 1 byte: (*processedSize > 0).
+      You must call Write() in loop, if you need to write exact amount of data.
+    }
+
+    ERROR CASES:
+      If the function returns error code, then (*processedSize) is size of
+      data written from (data) buffer.
     *)
   end;
 
@@ -164,7 +236,7 @@ type
     function GetSize(size: PInt64): HRESULT; stdcall;
   end;
 
-  IOutStreamFlush = interface(IUnknown)
+  IOutStreamFinish = interface(IUnknown)
   ['{23170F69-40C1-278A-0000-000300070000}']
     function Flush: HRESULT; stdcall;
   end;
@@ -189,17 +261,37 @@ type
     kDOS
   );
 
-// NArchive::
-  NArchive = (
-    kName = 0,          // string
-    kClassID,           // GUID
-    kExtension,         // string  zip rar gz
-    kAddExtension,      // sub archive: tar 
-    kUpdate,            // bool
-    kKeepName,          // bool
-    kStartSignature,    // string[4] ex: PK.. 7z.. Rar!
-    kFinishSignature,
-    kAssociate
+// NArcInfoFlags
+  NArcInfoFlags = (
+    aifKeepName        = 1 shl 0,  // keep name of file in archive name
+    aifAltStreams      = 1 shl 1,  // the handler supports alt streams
+    aifNtSecure        = 1 shl 2,  // the handler supports NT security
+    aifFindSignature   = 1 shl 3,  // the handler can find start of archive
+    aifMultiSignature  = 1 shl 4,  // there are several signatures
+    aifUseGlobalOffset = 1 shl 5,  // the seek position of stream must be set as global offset
+    aifStartOpen       = 1 shl 6,  // call handler for each start position
+    aifPureStartOpen   = 1 shl 7,  // call handler only for start of file
+    aifBackwardOpen    = 1 shl 8,  // archive can be open backward
+    aifPreArc          = 1 shl 9,  // such archive can be stored before real archive (like SFX stub)
+    aifSymLinks        = 1 shl 10, // the handler supports symbolic links
+    aifHardLinks       = 1 shl 11  // the handler supports hard links
+  );
+
+// NArchive::NHandlerPropID
+  NHandlerPropID = (
+    kName = 0,          // VT_BSTR
+    kClassID,           // binary GUID in VT_BSTR
+    kExtension,         // VT_BSTR
+    kAddExtension,      // VT_BSTR
+    kUpdate,            // VT_BOOL
+    kKeepName,          // VT_BOOL
+    kSignature,         // binary in VT_BSTR
+    kMultiSignature,    // binary in VT_BSTR
+    kSignatureOffset,   // VT_UI4
+    kAltStreams,        // VT_BOOL
+    kNtSecure,          // VT_BOOL
+    kFlags              // VT_UI4
+    // kVersion           // VT_UI4 ((VER_MAJOR << 8) | VER_MINOR)
   );
 
 // NArchive::NExtract::NAskMode
@@ -214,7 +306,21 @@ type
     kOK = 0,
     kUnSupportedMethod,
     kDataError,
-    kCRCError
+    kCRCError,
+    kUnavailable,
+    kUnexpectedEnd,
+    kDataAfterEnd,
+    kIsNotArc,
+    kHeadersError,
+    kWrongPassword
+  );
+
+// NArchive::NEventIndexType
+  NEventIndexType = (
+    kNoIndex = 0,
+    kInArcIndex,
+    kBlockIndex,
+    kOutArcIndex
   );
 
 // NArchive::NUpdate::NOperationResult
@@ -227,6 +333,54 @@ type
   ['{23170F69-40C1-278A-0000-000600100000}']
     function SetTotal(files, bytes: PInt64): HRESULT; stdcall;
     function SetCompleted(files, bytes: PInt64): HRESULT; stdcall;
+    (*
+    IArchiveExtractCallback::
+
+    7-Zip doesn't call IArchiveExtractCallback functions
+      GetStream()
+      PrepareOperation()
+      SetOperationResult()
+    from different threads simultaneously.
+    But 7-Zip can call functions for IProgress or ICompressProgressInfo functions
+    from another threads simultaneously with calls for IArchiveExtractCallback interface.
+
+    IArchiveExtractCallback::GetStream()
+      UInt32 index - index of item in Archive
+      Int32 askExtractMode  (Extract::NAskMode)
+        if (askMode != NExtract::NAskMode::kExtract)
+        {
+          then the callee can not real stream: (*inStream == NULL)
+        }
+
+      Out:
+          (*inStream == NULL) - for directories
+          (*inStream == NULL) - if link (hard link or symbolic link) was created
+          if (*inStream == NULL && askMode == NExtract::NAskMode::kExtract)
+          {
+            then the caller must skip extracting of that file.
+          }
+
+      returns:
+        S_OK     : OK
+        S_FALSE  : data error (for decoders)
+
+    if (IProgress::SetTotal() was called)
+    {
+      IProgress::SetCompleted(completeValue) uses
+        packSize   - for some stream formats (xz, gz, bz2, lzma, z, ppmd).
+        unpackSize - for another formats.
+    }
+    else
+    {
+      IProgress::SetCompleted(completeValue) uses packSize.
+    }
+
+    SetOperationResult()
+      7-Zip calls SetOperationResult at the end of extracting,
+      so the callee can close the file, set attributes, timestamps and security information.
+
+      Int32 opRes (NExtract::NOperationResult)
+    *)
   end;
 
   IArchiveExtractCallback = interface(IProgress)
@@ -236,6 +390,19 @@ type
     // GetStream OUT: S_OK - OK, S_FALSE - skeep this file
     function PrepareOperation(askExtractMode: NAskMode): HRESULT; stdcall;
     function SetOperationResult(resultEOperationResult: NExtOperationResult): HRESULT; stdcall;
+    (*
+    IArchiveExtractCallbackMessage can be requested from IArchiveExtractCallback object
+      by Extract() or UpdateItems() functions to report about extracting errors
+    ReportExtractResult()
+      UInt32 indexType (NEventIndexType)
+      UInt32 index
+      Int32 opRes (NExtract::NOperationResult)
+    *)
+  end;
+
+  IArchiveExtractCallbackMessage = interface
+  ['{23170F69-40C1-278A-0000-000600210000}']
+    function ReportExtractResult(indexType: NEventIndexType; index: Cardinal; opRes: Integer): HRESULT; stdcall;
   end;
 
   IArchiveOpenVolumeCallback = interface
@@ -258,6 +425,39 @@ type
   ['{23170F69-40C1-278A-0000-000600600000}']
     function Open(stream: IInStream; const maxCheckStartPosition: PInt64;
         openArchiveCallback: IArchiveOpenCallback): HRESULT; stdcall;
+    (*
+    IInArchive::Open
+        stream
+          if (kUseGlobalOffset), stream current position can be non 0.
+          if (!kUseGlobalOffset), stream current position is 0.
+        if (maxCheckStartPosition == NULL), the handler can try to search archive start in stream
+        if (*maxCheckStartPosition == 0), the handler must check only current position as archive start
+
+    IInArchive::Extract:
+      indices must be sorted
+      numItems = (UInt32)(Int32)-1 = 0xFFFFFFFF means "all files"
+      testMode != 0 means "test files without writing to outStream"
+
+    IInArchive::GetArchiveProperty:
+      kpidOffset  - start offset of archive.
+          VT_EMPTY : means offset = 0.
+          VT_UI4, VT_UI8, VT_I8 : result offset; negative values is allowed
+      kpidPhySize - size of archive. VT_EMPTY means unknown size.
+        kpidPhySize is allowed to be larger than file size. In that case it must show
+        supposed size.
+
+      kpidIsDeleted:
+      kpidIsAltStream:
+      kpidIsAux:
+      kpidINode:
+        must return VARIANT_TRUE (VT_BOOL), if archive can support that property in GetProperty.
+
+
+    Notes:
+      Don't call IInArchive functions for same IInArchive object from different threads simultaneously.
+      Some IInArchive handlers will work incorrectly in that case.
+    *)
+
     function Close: HRESULT; stdcall;
     function GetNumberOfItems(var numItems: CArdinal): HRESULT; stdcall;
     function GetProperty(index: Cardinal; propID: PROPID; var value: OleVariant): HRESULT; stdcall;
@@ -276,6 +476,47 @@ type
     function GetNumberOfArchiveProperties(var numProperties: Cardinal): HRESULT; stdcall;
     function GetArchivePropertyInfo(index: Cardinal;
         name: PBSTR; propID: PPropID; varType: PVARTYPE): HRESULT; stdcall;
+  end;
+
+  IArchiveOpenSeq = interface
+  ['{23170F69-40C1-278A-0000-000600610000}']
+    function OpenSeq(var stream: ISequentialInStream): HRESULT; stdcall;
+  end;
+
+// NParentType::
+  NParentType = (
+    kDir = 0,
+    kAltStream
+  );
+
+// NPropDataType::
+  NPropDataType = (
+    kMask_ZeroEnd   = $10, // 1 shl 4,
+    // kMask_BigEndian = 1 shl 5,
+    kMask_Utf       = $40, // 1 shl 6,
+    kMask_Utf8      = $40, // kMask_Utf or 0,
+    kMask_Utf16     = $41, // kMask_Utf or 1,
+    // kMask_Utf32 = $42, // kMask_Utf or 2,
+
+    kNotDefined = 0,
+    kRaw = 1,
+
+    kUtf8z  = $50, // kMask_Utf8  or kMask_ZeroEnd,
+    kUtf16z = $51  // kMask_Utf16 or kMask_ZeroEnd
+  );
+
+  IArchiveGetRawProps = interface
+  ['{23170F69-40C1-278A-0000-000600700000}']
+    function GetParent(index: Cardinal; var parent: Cardinal; var parentType: Cardinal): HRESULT; stdcall;
+    function GetRawProp(index: Cardinal; propID: PROPID; var data: Pointer; var dataSize: Cardinal; var propType: Cardinal): HRESULT; stdcall;
+    function GetNumRawProps(var numProps: Cardinal): HRESULT; stdcall;
+    function GetRawPropInfo(index: Cardinal; name: PBSTR; var propID: PROPID): HRESULT; stdcall;
+  end;
+
+  IArchiveGetRootProps = interface
+  ['{23170F69-40C1-278A-0000-000600710000}']
+    function GetRootProp(propID: PROPID; var value: PROPVARIANT): HRESULT; stdcall;
+    function GetRootRawProp(propID: PROPID; var data: Pointer; var dataSize: Cardinal; var propType: Cardinal): HRESULT; stdcall;
   end;
 
   IArchiveUpdateCallback = interface(IProgress)
@@ -336,22 +577,26 @@ type
       progress: ICompressProgressInfo): HRESULT; stdcall;
   end;
 
-const
 //NCoderPropID::
-  kDictionarySize    = $400;
-  kUsedMemorySize    = kDictionarySize + 1;
-  kOrder             = kUsedMemorySize + 1;
-  kPosStateBits      = $440;
-  kLitContextBits    = kPosStateBits + 1;
-  kLitPosBits        = kLitContextBits + 1;
-  kNumFastBytes      = $450;
-  kMatchFinder       = kNumFastBytes + 1;
-  kMatchFinderCycles = kMatchFinder + 1;
-  kNumPasses         = $460;
-  kAlgorithm         = $470;
-  kMultiThread       = $480;
-  kNumThreads        = kMultiThread + 1;
-  kEndMarker         = $490;
+  NCoderPropID = (
+    kDefaultProp = 0,
+    kDictionarySize,
+    kUsedMemorySize,
+    kOrder,
+    kBlockSize,
+    kPosStateBits,
+    kLitContextBits,
+    kLitPosBits,
+    kNumFastBytes,
+    kMatchFinder,
+    kMatchFinderCycles,
+    kNumPasses,
+    kAlgorithm,
+    kNumThreads,
+    kEndMarker,
+    kLevel,
+    kReduceSize // estimated size of data that will be compressed. Encoder can use this value to reduce dictionary size.
+  );
 
 type
   ICompressSetCoderProperties = interface
@@ -445,15 +690,16 @@ CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
 // It's for DLL file
 //NMethodPropID::
   NMethodPropID = (
-    kID = 0,
-    kName_,
+    kID,
+    kMethodName, // kName
     kDecoder,
     kEncoder,
-    kInStreams,
-    kOutStreams,
+    kPackStreams,
+    kUnpackStreams,
     kDescription,
     kDecoderIsAssigned,
-    kEncoderIsAssigned
+    kEncoderIsAssigned,
+    kDigestSize
   );
 
 //******************************************************************************
@@ -520,7 +766,7 @@ CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
 
 
   T7zStream = class(TInterfacedObject, IInStream, IStreamGetSize,
-    ISequentialOutStream, ISequentialInStream, IOutStream, IOutStreamFlush)
+    ISequentialOutStream, ISequentialInStream, IOutStream, IOutStreamFinish)
   private
     FStream: TStream;
     FOwnership: TStreamOwnership;
@@ -575,50 +821,61 @@ type
   function CreateOutArchive(const classid: TGUID; const lib: string = '7z.dll'): I7zOutArchive;
 
 const
-  CLSID_CFormatZip      : TGUID = '{23170F69-40C1-278A-1000-000110010000}'; // zip jar xpi
-  CLSID_CFormatBZ2      : TGUID = '{23170F69-40C1-278A-1000-000110020000}'; // bz2 bzip2 tbz2 tbz
-  CLSID_CFormatRar      : TGUID = '{23170F69-40C1-278A-1000-000110030000}'; // rar r00
-  CLSID_CFormatArj      : TGUID = '{23170F69-40C1-278A-1000-000110040000}'; // arj
-  CLSID_CFormatZ        : TGUID = '{23170F69-40C1-278A-1000-000110050000}'; // z taz
-  CLSID_CFormatLzh      : TGUID = '{23170F69-40C1-278A-1000-000110060000}'; // lzh lha
-  CLSID_CFormat7z       : TGUID = '{23170F69-40C1-278A-1000-000110070000}'; // 7z
-  CLSID_CFormatCab      : TGUID = '{23170F69-40C1-278A-1000-000110080000}'; // cab
-  CLSID_CFormatNsis     : TGUID = '{23170F69-40C1-278A-1000-000110090000}';
-  CLSID_CFormatLzma     : TGUID = '{23170F69-40C1-278A-1000-0001100A0000}'; // lzma
-  CLSID_CFormatLzma86   : TGUID = '{23170F69-40C1-278A-1000-0001100B0000}'; // lzma 86
-  CLSID_CFormatXz       : TGUID = '{23170F69-40C1-278A-1000-0001100C0000}'; // xz
-  CLSID_CFormatPpmd     : TGUID = '{23170F69-40C1-278A-1000-0001100D0000}'; // ppmd
+  CLSID_CFormatZip      : TGUID = '{23170F69-40C1-278A-1000-000110010000}'; // [OUT] zip jar xpi
+  CLSID_CFormatBZ2      : TGUID = '{23170F69-40C1-278A-1000-000110020000}'; // [OUT] bz2 bzip2 tbz2 tbz
+  CLSID_CFormatRar      : TGUID = '{23170F69-40C1-278A-1000-000110030000}'; // [IN ] rar r00
+  CLSID_CFormatArj      : TGUID = '{23170F69-40C1-278A-1000-000110040000}'; // [IN ] arj
+  CLSID_CFormatZ        : TGUID = '{23170F69-40C1-278A-1000-000110050000}'; // [IN ] z taz
+  CLSID_CFormatLzh      : TGUID = '{23170F69-40C1-278A-1000-000110060000}'; // [IN ] lzh lha
+  CLSID_CFormat7z       : TGUID = '{23170F69-40C1-278A-1000-000110070000}'; // [OUT] 7z
+  CLSID_CFormatCab      : TGUID = '{23170F69-40C1-278A-1000-000110080000}'; // [IN ] cab
+  CLSID_CFormatNsis     : TGUID = '{23170F69-40C1-278A-1000-000110090000}'; // [IN ] nsis
+  CLSID_CFormatLzma     : TGUID = '{23170F69-40C1-278A-1000-0001100A0000}'; // [IN ] lzma
+  CLSID_CFormatLzma86   : TGUID = '{23170F69-40C1-278A-1000-0001100B0000}'; // [IN ] lzma 86
+  CLSID_CFormatXz       : TGUID = '{23170F69-40C1-278A-1000-0001100C0000}'; // [OUT] xz
+  CLSID_CFormatPpmd     : TGUID = '{23170F69-40C1-278A-1000-0001100D0000}'; // [IN ] ppmd
 
-  CLSID_CFormatSquashFS : TGUID = '{23170F69-40C1-278A-1000-000110D20000}';
-  CLSID_CFormatCramFS   : TGUID = '{23170F69-40C1-278A-1000-000110D30000}';
-  CLSID_CFormatAPM      : TGUID = '{23170F69-40C1-278A-1000-000110D40000}';
-  CLSID_CFormatMslz     : TGUID = '{23170F69-40C1-278A-1000-000110D50000}';
-  CLSID_CFormatFlv      : TGUID = '{23170F69-40C1-278A-1000-000110D60000}';
-  CLSID_CFormatSwf      : TGUID = '{23170F69-40C1-278A-1000-000110D70000}';
-  CLSID_CFormatSwfc     : TGUID = '{23170F69-40C1-278A-1000-000110D80000}';
-  CLSID_CFormatNtfs     : TGUID = '{23170F69-40C1-278A-1000-000110D90000}';
-  CLSID_CFormatFat      : TGUID = '{23170F69-40C1-278A-1000-000110DA0000}';
-  CLSID_CFormatMbr      : TGUID = '{23170F69-40C1-278A-1000-000110DB0000}';
-  CLSID_CFormatVhd      : TGUID = '{23170F69-40C1-278A-1000-000110DC0000}';
-  CLSID_CFormatPe       : TGUID = '{23170F69-40C1-278A-1000-000110DD0000}';
-  CLSID_CFormatElf      : TGUID = '{23170F69-40C1-278A-1000-000110DE0000}';
-  CLSID_CFormatMacho    : TGUID = '{23170F69-40C1-278A-1000-000110DF0000}';
-  CLSID_CFormatUdf      : TGUID = '{23170F69-40C1-278A-1000-000110E00000}'; // iso
-  CLSID_CFormatXar      : TGUID = '{23170F69-40C1-278A-1000-000110E10000}'; // xar
-  CLSID_CFormatMub      : TGUID = '{23170F69-40C1-278A-1000-000110E20000}';
-  CLSID_CFormatHfs      : TGUID = '{23170F69-40C1-278A-1000-000110E30000}';
-  CLSID_CFormatDmg      : TGUID = '{23170F69-40C1-278A-1000-000110E40000}'; // dmg
-  CLSID_CFormatCompound : TGUID = '{23170F69-40C1-278A-1000-000110E50000}'; // msi doc xls ppt
-  CLSID_CFormatWim      : TGUID = '{23170F69-40C1-278A-1000-000110E60000}'; // wim swm
-  CLSID_CFormatIso      : TGUID = '{23170F69-40C1-278A-1000-000110E70000}'; // iso
-  CLSID_CFormatBkf      : TGUID = '{23170F69-40C1-278A-1000-000110E80000}';
-  CLSID_CFormatChm      : TGUID = '{23170F69-40C1-278A-1000-000110E90000}'; // chm chi chq chw hxs hxi hxr hxq hxw lit
-  CLSID_CFormatSplit    : TGUID = '{23170F69-40C1-278A-1000-000110EA0000}'; // 001
-  CLSID_CFormatRpm      : TGUID = '{23170F69-40C1-278A-1000-000110EB0000}'; // rpm
-  CLSID_CFormatDeb      : TGUID = '{23170F69-40C1-278A-1000-000110EC0000}'; // deb
-  CLSID_CFormatCpio     : TGUID = '{23170F69-40C1-278A-1000-000110ED0000}'; // cpio
-  CLSID_CFormatTar      : TGUID = '{23170F69-40C1-278A-1000-000110EE0000}'; // tar
-  CLSID_CFormatGZip     : TGUID = '{23170F69-40C1-278A-1000-000110EF0000}'; // gz gzip tgz tpz
+  CLSID_CFormatExt      : TGUID = '{23170F69-40C1-278A-1000-000110C70000}'; // [IN ] ext
+  CLSID_CFormatVMDK     : TGUID = '{23170F69-40C1-278A-1000-000110C80000}'; // [IN ] vmdk
+  CLSID_CFormatVDI      : TGUID = '{23170F69-40C1-278A-1000-000110C90000}'; // [IN ] vdi
+  CLSID_CFormatQcow     : TGUID = '{23170F69-40C1-278A-1000-000110CA0000}'; // [IN ] qcow
+  CLSID_CFormatGPT      : TGUID = '{23170F69-40C1-278A-1000-000110CB0000}'; // [IN ] GPT
+  CLSID_CFormatRar5     : TGUID = '{23170F69-40C1-278A-1000-000110CC0000}'; // [IN ] Rar5
+  CLSID_CFormatIHex     : TGUID = '{23170F69-40C1-278A-1000-000110CD0000}'; // [IN ] IHex
+  CLSID_CFormatHxs      : TGUID = '{23170F69-40C1-278A-1000-000110CE0000}'; // [IN ] Hxs
+  CLSID_CFormatTE       : TGUID = '{23170F69-40C1-278A-1000-000110CF0000}'; // [IN ] TE
+  CLSID_CFormatUEFIc    : TGUID = '{23170F69-40C1-278A-1000-000110D00000}'; // [IN ] UEFIc
+  CLSID_CFormatUEFIs    : TGUID = '{23170F69-40C1-278A-1000-000110D10000}'; // [IN ] UEFIs
+  CLSID_CFormatSquashFS : TGUID = '{23170F69-40C1-278A-1000-000110D20000}'; // [IN ] SquashFS
+  CLSID_CFormatCramFS   : TGUID = '{23170F69-40C1-278A-1000-000110D30000}'; // [IN ] CramFS
+  CLSID_CFormatAPM      : TGUID = '{23170F69-40C1-278A-1000-000110D40000}'; // [IN ] APM
+  CLSID_CFormatMslz     : TGUID = '{23170F69-40C1-278A-1000-000110D50000}'; // [IN ] MsLZ
+  CLSID_CFormatFlv      : TGUID = '{23170F69-40C1-278A-1000-000110D60000}'; // [IN ] FLV
+  CLSID_CFormatSwf      : TGUID = '{23170F69-40C1-278A-1000-000110D70000}'; // [IN ] SWF
+  CLSID_CFormatSwfc     : TGUID = '{23170F69-40C1-278A-1000-000110D80000}'; // [IN ] SWFC
+  CLSID_CFormatNtfs     : TGUID = '{23170F69-40C1-278A-1000-000110D90000}'; // [IN ] NTFS
+  CLSID_CFormatFat      : TGUID = '{23170F69-40C1-278A-1000-000110DA0000}'; // [IN ] FAT
+  CLSID_CFormatMbr      : TGUID = '{23170F69-40C1-278A-1000-000110DB0000}'; // [IN ] MBR
+  CLSID_CFormatVhd      : TGUID = '{23170F69-40C1-278A-1000-000110DC0000}'; // [IN ] VHD
+  CLSID_CFormatPe       : TGUID = '{23170F69-40C1-278A-1000-000110DD0000}'; // [IN ] PE (Windows Exe)
+  CLSID_CFormatElf      : TGUID = '{23170F69-40C1-278A-1000-000110DE0000}'; // [IN ] ELF (Linux Exe)
+  CLSID_CFormatMachO    : TGUID = '{23170F69-40C1-278A-1000-000110DF0000}'; // [IN ] Mach-O
+  CLSID_CFormatUdf      : TGUID = '{23170F69-40C1-278A-1000-000110E00000}'; // [IN ] iso
+  CLSID_CFormatXar      : TGUID = '{23170F69-40C1-278A-1000-000110E10000}'; // [IN ] xar
+  CLSID_CFormatMub      : TGUID = '{23170F69-40C1-278A-1000-000110E20000}'; // [IN ] mub
+  CLSID_CFormatHfs      : TGUID = '{23170F69-40C1-278A-1000-000110E30000}'; // [IN ] HFS
+  CLSID_CFormatDmg      : TGUID = '{23170F69-40C1-278A-1000-000110E40000}'; // [IN ] dmg
+  CLSID_CFormatCompound : TGUID = '{23170F69-40C1-278A-1000-000110E50000}'; // [IN ] msi doc xls ppt
+  CLSID_CFormatWim      : TGUID = '{23170F69-40C1-278A-1000-000110E60000}'; // [OUT] wim swm
+  CLSID_CFormatIso      : TGUID = '{23170F69-40C1-278A-1000-000110E70000}'; // [IN ] iso
+  CLSID_CFormatBkf      : TGUID = '{23170F69-40C1-278A-1000-000110E80000}'; // [IN ] BKF
+  CLSID_CFormatChm      : TGUID = '{23170F69-40C1-278A-1000-000110E90000}'; // [IN ] chm chi chq chw hxs hxi hxr hxq hxw lit
+  CLSID_CFormatSplit    : TGUID = '{23170F69-40C1-278A-1000-000110EA0000}'; // [IN ] 001
+  CLSID_CFormatRpm      : TGUID = '{23170F69-40C1-278A-1000-000110EB0000}'; // [IN ] rpm
+  CLSID_CFormatDeb      : TGUID = '{23170F69-40C1-278A-1000-000110EC0000}'; // [IN ] deb
+  CLSID_CFormatCpio     : TGUID = '{23170F69-40C1-278A-1000-000110ED0000}'; // [IN ] cpio
+  CLSID_CFormatTar      : TGUID = '{23170F69-40C1-278A-1000-000110EE0000}'; // [OUT] tar
+  CLSID_CFormatGZip     : TGUID = '{23170F69-40C1-278A-1000-000110EF0000}'; // [OUT] gz gzip tgz tpz
 
 implementation
 
@@ -795,16 +1052,16 @@ type
 
   T7zArchive = class(T7zPlugin)
   private
-    FGetHandlerProperty: function(propID: NArchive; var value: OleVariant): HRESULT; stdcall;
+    FGetHandlerProperty: function(propID: NHandlerPropID; var value: OleVariant): HRESULT; stdcall;
     FClassId: TGUID;
     procedure SetClassId(const classid: TGUID);
     function GetClassId: TGUID;
   public
-    function GetHandlerProperty(const propID: NArchive): OleVariant;
-    function GetLibStringProperty(const Index: NArchive): string;
-    function GetLibGUIDProperty(const Index: NArchive): TGUID;
+    function GetHandlerProperty(const propID: NHandlerPropID): OleVariant;
+    function GetLibStringProperty(const Index: NHandlerPropID): string;
+    function GetLibGUIDProperty(const Index: NHandlerPropID): TGUID;
     constructor Create(const lib: string); override;
-    property HandlerProperty[const propID: NArchive]: OleVariant read GetHandlerProperty;
+    property HandlerProperty[const propID: NHandlerPropID]: OleVariant read GetHandlerProperty;
     property Name: string index kName read GetLibStringProperty;
     property ClassID: TGUID read GetClassId write SetClassId;
     property Extension: string index kExtension read GetLibStringProperty;
@@ -997,7 +1254,7 @@ end;
 
 function T7zCodec.GetName(const index: integer): string;
 begin
-  Result := MethodProperty[index, kName_];
+  Result := MethodProperty[index, kMethodName];
 end;
 
 function T7zCodec.GetNumberOfMethods: Cardinal;
@@ -1083,7 +1340,7 @@ end;
 
 function T7zInArchive.GetItemIsFolder(const index: integer): boolean; stdcall;
 begin
-  Result := Boolean(GetItemProp(index, kpidIsFolder));
+  Result := Boolean(GetItemProp(index, kpidIsDir));
 end;
 
 function T7zInArchive.GetItemProp(const Item: Cardinal;
@@ -1294,7 +1551,7 @@ begin
   Result := FClassId;
 end;
 
-function T7zArchive.GetHandlerProperty(const propID: NArchive): OleVariant;
+function T7zArchive.GetHandlerProperty(const propID: NHandlerPropID): OleVariant;
 var
   hr: HRESULT;
 begin
@@ -1303,7 +1560,7 @@ begin
     raise Exception.Create(SysErrorMessage(hr));
 end;
 
-function T7zArchive.GetLibGUIDProperty(const Index: NArchive): TGUID;
+function T7zArchive.GetLibGUIDProperty(const Index: NHandlerPropID): TGUID;
 var
   v: OleVariant;
 begin
@@ -1311,7 +1568,7 @@ begin
   Result := TPropVariant(v).puuid^;
 end;
 
-function T7zArchive.GetLibStringProperty(const Index: NArchive): string;
+function T7zArchive.GetLibStringProperty(const Index: NHandlerPropID): string;
 begin
   Result := HandlerProperty[Index];
 end;
@@ -1559,12 +1816,12 @@ var
 begin
   item := T7zBatchItem(FBatchList[index]);
   case propID of
-    kpidAttributes:
+    kpidAttrib:
       begin
         TPropVariant(Value).vt := VT_UI4;
         TPropVariant(Value).ulVal := item.Attributes;
       end;
-    kpidLastWriteTime:
+    kpidMTime:
       begin
         TPropVariant(value).vt := VT_FILETIME;
         TPropVariant(value).filetime := item.LastWriteTime;
@@ -1574,13 +1831,13 @@ begin
         if item.Path <> '' then
           value := item.Path;
       end;
-    kpidIsFolder: Value := item.IsFolder;
+    kpidIsDir: Value := item.IsFolder;
     kpidSize:
       begin
         TPropVariant(Value).vt := VT_UI8;
         TPropVariant(Value).uhVal.QuadPart := item.Size;
       end;
-    kpidCreationTime:
+    kpidCTime:
       begin
         TPropVariant(value).vt := VT_FILETIME;
         TPropVariant(value).filetime := item.CreationTime;
@@ -1686,13 +1943,3 @@ begin
 end;
 
 end.
-
-
-
-
-
-
-
-
-
-
