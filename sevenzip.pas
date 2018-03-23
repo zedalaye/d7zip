@@ -1137,7 +1137,7 @@ type
     IArchiveOpenSetSubArchiveName)
   private
     //fix by flying wang.
-    FLasstFileAttr: Cardinal;
+    FLastWriteFileAttr: Cardinal;
     FLastWriteFileDataTime: TDateTime;
     FLastWriteFile: string;
     FInArchive: IInArchive;
@@ -1386,7 +1386,7 @@ end;
 procedure T7zInArchive.ResetLastFileInfo;
 begin
   //fix by flying wang.
-  FLasstFileAttr := faNormal;
+  FLastWriteFileAttr := faNormal;
   FLastWriteFileDataTime := MinDateTime;
   FLastWriteFile := '';
 end;
@@ -1492,11 +1492,11 @@ begin
       begin
         path := FExtractPath + GetItemPath(index);
         ForceDirectories(ExtractFilePath(path));
-        FLasstFileAttr := 0;
+        FLastWriteFileAttr := 0;
         if FileExists(path) then
         begin
-          FLasstFileAttr := FileGetAttr(path);
-          if FLasstFileAttr <> faNormal then
+          FLastWriteFileAttr := FileGetAttr(path);
+          if FLastWriteFileAttr <> faNormal then
             FileSetAttr(path, faNormal);
         end;
 
@@ -1530,8 +1530,8 @@ begin
           FreeAndNil(nFileStream);
           FLastWriteFileDataTime := GetItemDataTime(index);
           FLastWriteFile := path;
-          if (FLasstFileAttr <> 0) and (FLasstFileAttr <> faNormal) then
-            FileSetAttr(FLastWriteFile, FLasstFileAttr);
+          if (FLastWriteFileAttr <> 0) and (FLastWriteFileAttr <> faNormal) then
+            FileSetAttr(FLastWriteFile, FLastWriteFileAttr);
           FileSetDate(FLastWriteFile, DateTimeToFileDate(FLastWriteFileDataTime));
           outStream := T7zStream.Create(TFileStream.Create(path, fmCreate), soOwned);
         end;
@@ -1565,8 +1565,8 @@ begin
   //fix by flying wang.
   if FileExists(FLastWriteFile) then
   begin
-    if (FLasstFileAttr <> 0) and (FLasstFileAttr <> faNormal) then
-      FileSetAttr(FLastWriteFile, FLasstFileAttr);
+    if (FLastWriteFileAttr <> 0) and (FLastWriteFileAttr <> faNormal) then
+      FileSetAttr(FLastWriteFile, FLastWriteFileAttr);
     FileSetDate(FLastWriteFile, DateTimeToFileDate(FLastWriteFileDataTime));
   end;
   ResetLastFileInfo;
