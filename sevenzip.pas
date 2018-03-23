@@ -37,7 +37,10 @@ BUG修改:
 //V1.2.3
 //新增解压文件的属性设置。
 //add IncludeEmptyDir
+//add support Int64 for file size
 //fix by flying wang.
+
+//also you can use JclCompression instead of this.
 
 unit sevenzip;
 {$ALIGN ON}
@@ -764,9 +767,9 @@ CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
     function GetNumberOfItems: Cardinal; stdcall;
     function GetItemPath(const index: integer): UnicodeString; stdcall;
     function GetItemName(const index: integer): UnicodeString; stdcall;
-    function GetItemSize(const index: integer): Cardinal; stdcall;
+    function GetItemSize(const index: integer): Int64; stdcall;
     //fix by flying wang.
-    function GetItemCompressedSize(const index: integer): Cardinal; stdcall;
+    function GetItemCompressedSize(const index: integer): Int64; stdcall;
     function GetItemFileTime(const index: integer): TFileTime; stdcall;
     function GetItemDataTime(const index: integer): TDateTime; stdcall;
     function GetItemIsFolder(const index: integer): boolean; stdcall;
@@ -787,9 +790,9 @@ CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
     property NumberOfItems: Cardinal read GetNumberOfItems;
     property ItemPath[const index: integer]: UnicodeString read GetItemPath;
     property ItemName[const index: integer]: UnicodeString read GetItemName;
-    property ItemSize[const index: integer]: Cardinal read GetItemSize;
+    property ItemSize[const index: integer]: Int64 read GetItemSize;
     //fix by flying wang.
-    property ItemCompressedSize[const index: integer]: Cardinal read GetItemCompressedSize;
+    property ItemCompressedSize[const index: integer]: Int64 read GetItemCompressedSize;
     property ItemFileTime[const index: integer]: TFileTime read GetItemFileTime;
     property ItemDataTime[const index: integer]: TDateTime read GetItemDataTime;
     property ItemIsFolder[const index: integer]: boolean read GetItemIsFolder;
@@ -931,6 +934,64 @@ const
   CLSID_CFormatCpio     : TGUID = '{23170F69-40C1-278A-1000-000110ED0000}'; // [IN ] cpio
   CLSID_CFormatTar      : TGUID = '{23170F69-40C1-278A-1000-000110EE0000}'; // [OUT] tar
   CLSID_CFormatGZip     : TGUID = '{23170F69-40C1-278A-1000-000110EF0000}'; // [OUT] gz gzip tgz tpz
+
+//fix or copy from Jedi JCL
+// ZipHandlerOut.cpp
+const
+  kDeflateAlgoX1 = 0 {$IFDEF SUPPORTS_DEPRECATED} deprecated {$IFDEF SUPPORTS_DEPRECATED_DETAILS} 'Use kLzAlgoX1' {$ENDIF} {$ENDIF};
+  kLzAlgoX1 = 0;
+  kDeflateAlgoX5 = 1 {$IFDEF SUPPORTS_DEPRECATED} deprecated {$IFDEF SUPPORTS_DEPRECATED_DETAILS} 'Use kLzAlgoX5' {$ENDIF} {$ENDIF};
+  kLzAlgoX5 = 1;
+
+  kDeflateNumPassesX1  = 1;
+  kDeflateNumPassesX7  = 3;
+  kDeflateNumPassesX9  = 10;
+
+  kNumFastBytesX1 = 32 {$IFDEF SUPPORTS_DEPRECATED} deprecated {$IFDEF SUPPORTS_DEPRECATED_DETAILS} 'Use kDeflateNumFastBytesX1' {$ENDIF} {$ENDIF};
+  kDeflateNumFastBytesX1 = 32;
+  kNumFastBytesX7 = 64 {$IFDEF SUPPORTS_DEPRECATED} deprecated {$IFDEF SUPPORTS_DEPRECATED_DETAILS} 'Use kDeflateNumFastBytesX7' {$ENDIF} {$ENDIF};
+  kDeflateNumFastBytesX7 = 64;
+  kNumFastBytesX9 = 128 {$IFDEF SUPPORTS_DEPRECATED} deprecated {$IFDEF SUPPORTS_DEPRECATED_DETAILS} 'Use kDeflateNumFastBytesX9' {$ENDIF} {$ENDIF};
+  kDeflateNumFastBytesX9 = 128;
+
+  kLzmaNumFastBytesX1 = 32;
+  kLzmaNumFastBytesX7 = 64;
+
+  kBZip2NumPassesX1 = 1;
+  kBZip2NumPassesX7 = 2;
+  kBZip2NumPassesX9 = 7;
+
+  kBZip2DicSizeX1 = 100000;
+  kBZip2DicSizeX3 = 500000;
+  kBZip2DicSizeX5 = 900000;
+
+// HandlerOut.cpp
+const
+  kLzmaAlgoX1 = 0;
+  kLzmaAlgoX5 = 1;
+
+  kLzmaDicSizeX1 = 1 shl 16;
+  kLzmaDicSizeX3 = 1 shl 20;
+  kLzmaDicSizeX5 = 1 shl 24;
+  kLzmaDicSizeX7 = 1 shl 25;
+  kLzmaDicSizeX9 = 1 shl 26;
+
+  kLzmaFastBytesX1 = 32;
+  kLzmaFastBytesX7 = 64;
+
+  kPpmdMemSizeX1 = (1 shl 22);
+  kPpmdMemSizeX5 = (1 shl 24);
+  kPpmdMemSizeX7 = (1 shl 26);
+  kPpmdMemSizeX9 = (192 shl 20);
+
+  kPpmdOrderX1 = 4;
+  kPpmdOrderX5 = 6;
+  kPpmdOrderX7 = 16;
+  kPpmdOrderX9 = 32;
+
+  kDeflateFastBytesX1 = 32;
+  kDeflateFastBytesX7 = 64;
+  kDeflateFastBytesX9 = 128;
 
 implementation
 
@@ -1089,6 +1150,7 @@ end;
 type
   T7zPlugin = class(TInterfacedObject)
   private
+    FAutoUnLoad7Zip: Boolean;
     FHandle: THandle;
     FCreateObject: function(const clsid, iid :TGUID; var outObject): HRESULT; stdcall;
   public
@@ -1168,9 +1230,9 @@ type
     function GetNumberOfItems: Cardinal; stdcall;
     function GetItemPath(const index: integer): UnicodeString; stdcall;
     function GetItemName(const index: integer): UnicodeString; stdcall;
-    function GetItemSize(const index: integer): Cardinal; stdcall; stdcall;
+    function GetItemSize(const index: integer): Int64; stdcall; stdcall;
     //fix by flying wang.
-    function GetItemCompressedSize(const index: integer): Cardinal; stdcall;
+    function GetItemCompressedSize(const index: integer): Int64; stdcall;
     function GetItemFileTime(const index: integer): TFileTime; stdcall;
     function GetItemDataTime(const index: integer): TDateTime; stdcall;
     function GetItemIsFolder(const index: integer): boolean; stdcall;
@@ -1266,6 +1328,7 @@ end;
 
 constructor T7zPlugin.Create(const lib: string);
 begin
+  inherited Create;
   FHandle := LoadLibrary(PChar(lib));
   if FHandle = 0 then
     raise exception.CreateFmt('Error loading library %s', [lib]);
@@ -1475,6 +1538,13 @@ begin
     end else
     if FExtractPath <> '' then
     begin
+//      //fix or remove by flying wang.
+//      if not GetItemIsFolder(index) then
+//      begin
+//        path := FExtractPath + GetItemPath(index);
+//        ForceDirectories(ExtractFilePath(path));
+//        outStream := T7zStream.Create(TFileStream.Create(path, fmCreate), soOwned);
+//      end;
       //fix by 刘志林 and flying wang.
       if GetItemIsFolder(index) then
       begin
@@ -1511,6 +1581,7 @@ begin
         until (nFileStream <> nil) or (nECR <> EC_RETRY);
         if nFileStream = nil then
         begin
+//          Result := kCallbackIGNORE;
           if nECR = EC_CANCEL then
           begin
             Result := kCallbackCANCEL;
@@ -1634,15 +1705,15 @@ begin
   Result := UnicodeString(GetItemProp(index, kpidName));
 end;
 
-function T7zInArchive.GetItemSize(const index: integer): Cardinal; stdcall;
+function T7zInArchive.GetItemSize(const index: integer): Int64; stdcall;
 begin
-  Result := Cardinal(GetItemProp(index, kpidSize));
+  Result := Int64(GetItemProp(index, kpidSize));
 end;
 
 //fix by flying wang.
-function T7zInArchive.GetItemCompressedSize(const index: integer): Cardinal; stdcall;
+function T7zInArchive.GetItemCompressedSize(const index: integer): Int64; stdcall;
 begin
-  Result := Cardinal(GetItemProp(index, kpidPackSize));
+  Result := Int64(GetItemProp(index, kpidPackSize));
 end;
 
 function T7zInArchive.GetItemFileTime(const index: integer): TFileTime; stdcall;
@@ -1852,7 +1923,7 @@ type
     IsFolder, IsAnti: boolean;
     FileName: TFileName;
     Ownership: TStreamOwnership;
-    Size: Cardinal;
+    Size: Int64;
     destructor Destroy; override;
   end;
 
@@ -1869,6 +1940,8 @@ procedure T7zOutArchive.AddFile(const Filename: TFileName; const Path: UnicodeSt
 var
   item: T7zBatchItem;
   Handle: THandle;
+  TempSize: Int64;
+  TempSizeHi: Cardinal;
 begin
   if not FileExists(Filename) then exit;
   item := T7zBatchItem.Create;
@@ -1878,7 +1951,9 @@ begin
   item.Path := Path;
   Handle := FileOpen(Filename, fmOpenRead or fmShareDenyNone);
   GetFileTime(Handle, @item.CreationTime, nil, @item.LastWriteTime);
-  item.Size := GetFileSize(Handle, nil);
+  Int64Rec(TempSize).Lo := GetFileSize(Handle, @TempSizeHi);
+  Int64Rec(TempSize).Hi := TempSizeHi;
+  item.Size := TempSize;
   CloseHandle(Handle);
   //item.Attributes := GetFileAttributes(PChar(Filename));
   //fix By Flying Wang.
@@ -2181,5 +2256,7 @@ end;
 initialization
   G_7zWorkPath := '';
 
-end.
+//finalization
 
+
+end.
