@@ -20,13 +20,13 @@ This API use the 7-zip dll (7z.dll) to read and write all 7-zip supported archiv
 - Autor: Henri Gourvest <hgourvest@progdigy.com>
 - Licence: MPL1.1
 - Date: 15/04/2009
-- Version: 1.1
+- Version: 1.2
 
 Reading archive:
 
 Extract to path:
 解压到目录：
-with CreateInArchive('Formats\zip.dll') do
+with CreateInArchive(CLSID_CFormatZip) do
 begin
    OpenFile('c:\test.zip');
    ExtractTo('c:\test');
@@ -34,7 +34,7 @@ end;
 
 Get file list:
 获取文件列表:
-with CreateInArchive('Formats\7z.dll') do
+with CreateInArchive(CLSID_CFormat7z, 'Formats\7z.dll') do
 begin
    OpenFile('c:\test.7z');
    for i := 0 to NumberOfItems - 1 do
@@ -44,7 +44,7 @@ end;
 
 Extract to stream
 解压到流:
-with CreateInArchive('Formats\7z.dll') do
+with CreateInArchive(CLSID_CFormat7z) do
 begin
    OpenFile('c:\test.7z');
    for i := 0 to NumberOfItems - 1 do
@@ -67,7 +67,7 @@ var
 i: integer;
 items: array[0..2] of Cardinal;
 begin
-  with CreateInArchive('Formats\7z.dll') do
+  with CreateInArchive(CLSID_CFormat7z) do
   begin
     OpenFile('c:\test.7z');
     // items must be sorted by index!
@@ -80,7 +80,7 @@ end;
 
 Open stream
 打开流:
-with CreateInArchive('Formats\zip.dll') do
+with CreateInArchive(CLSID_CFormatZip) do
 begin
    OpenStream(T7zStream.Create(TFileStream.Create('c:\test.zip', fmOpenRead), soOwned));
    OpenStream(aStream, soReference);
@@ -99,7 +99,7 @@ end;
 
 procedure TMainForm.ExtractClick(Sender: TObject);
 begin
-   with CreateInArchive('Formats\zip.dll') do
+   with CreateInArchive(CLSID_CFormatZip) do
 begin
      OpenFile('c:\test.zip');
      SetProgressCallback(nil, ProgressCallback);
@@ -117,7 +117,7 @@ begin
 end;
 procedure TMainForm.ExtractClick(Sender: TObject);
 begin
-   with CreateInArchive('Formats\zip.dll') do
+   with CreateInArchive(CLSID_CFormatZip) do
    begin
      // using callback
      SetPasswordCallback(nil, PasswordCallback);
@@ -134,7 +134,7 @@ procedure TMainForm.ExtractAllClick(Sender: TObject);
 var
    Arch: I7zOutArchive;
 begin
-   Arch := CreateOutArchive('Formats\7z.dll');
+   Arch := CreateOutArchive(CLSID_CFormat7z);
    // add a file
    Arch.AddFile('c:\test.bin', 'folder\test.bin');
    // add files using willcards and recursive search
