@@ -1150,7 +1150,6 @@ end;
 type
   T7zPlugin = class(TInterfacedObject)
   private
-    FAutoUnLoad7Zip: Boolean;
     FHandle: THandle;
     FCreateObject: function(const clsid, iid :TGUID; var outObject): HRESULT; stdcall;
   public
@@ -1538,13 +1537,6 @@ begin
     end else
     if FExtractPath <> '' then
     begin
-//      //fix or remove by flying wang.
-//      if not GetItemIsFolder(index) then
-//      begin
-//        path := FExtractPath + GetItemPath(index);
-//        ForceDirectories(ExtractFilePath(path));
-//        outStream := T7zStream.Create(TFileStream.Create(path, fmCreate), soOwned);
-//      end;
       //fix by 刘志林 and flying wang.
       if GetItemIsFolder(index) then
       begin
@@ -1581,7 +1573,6 @@ begin
         until (nFileStream <> nil) or (nECR <> EC_RETRY);
         if nFileStream = nil then
         begin
-//          Result := kCallbackIGNORE;
           if nECR = EC_CANCEL then
           begin
             Result := kCallbackCANCEL;
