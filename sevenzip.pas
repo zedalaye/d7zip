@@ -1475,13 +1475,6 @@ begin
     end else
     if FExtractPath <> '' then
     begin
-//      //fix or remove by flying wang.
-//      if not GetItemIsFolder(index) then
-//      begin
-//        path := FExtractPath + GetItemPath(index);
-//        ForceDirectories(ExtractFilePath(path));
-//        outStream := T7zStream.Create(TFileStream.Create(path, fmCreate), soOwned);
-//      end;
       //fix by 刘志林 and flying wang.
       if GetItemIsFolder(index) then
       begin
@@ -1518,7 +1511,6 @@ begin
         until (nFileStream <> nil) or (nECR <> EC_RETRY);
         if nFileStream = nil then
         begin
-//          Result := kCallbackIGNORE;
           if nECR = EC_CANCEL then
           begin
             Result := kCallbackCANCEL;
@@ -2082,12 +2074,6 @@ begin
         TPropVariant(value).ulVal := Integer(kUnix);
 {$ENDIF MSWINDOWS}
       end;
-////fix by flying wang.
-//    kpidPackSize:
-//      begin
-//        TPropVariant(Value).vt := VT_UI8;
-//        TPropVariant(Value).uhVal.QuadPart := item.PackSize;
-//      end;
     kpidIsAnti: value := item.IsAnti;
   else
    // beep(0,0);
