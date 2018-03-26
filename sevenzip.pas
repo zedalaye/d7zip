@@ -40,6 +40,11 @@ BUG修改:
 //add support Int64 for file size
 //fix by flying wang.
 
+//V1.2.5
+//add some IFDEF MSWINDOWS
+//add ExtractItemToPath from ekot1
+//fix by flying wang.
+
 //also you can use JclCompression instead of this.
 
 unit sevenzip;
@@ -48,7 +53,14 @@ unit sevenzip;
 {$WARN SYMBOL_PLATFORM OFF}
 
 interface
-uses SysUtils, Windows, ActiveX, Classes, Contnrs;
+uses
+{$IFDEF MSWINDOWS}
+  Windows, ActiveX,
+{$ENDIF MSWINDOWS}
+{$IFDEF POSIX}
+  Posix.Dlfcn, Posix.Fcntl,
+{$ENDIF POSIX}
+  SysUtils, Classes, Contnrs;
 
 var
   //fix by 刘志林
@@ -770,11 +782,15 @@ CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
     function GetItemSize(const index: integer): Int64; stdcall;
     //fix by flying wang.
     function GetItemCompressedSize(const index: integer): Int64; stdcall;
+{$IFDEF MSWINDOWS}
     function GetItemFileTime(const index: integer): TFileTime; stdcall;
+{$ENDIF MSWINDOWS}
     function GetItemDataTime(const index: integer): TDateTime; stdcall;
     function GetItemIsFolder(const index: integer): boolean; stdcall;
     function GetInArchive: IInArchive;
     procedure ExtractItem(const item: Cardinal; Stream: TStream; test: longbool); stdcall;
+    //fix or add by ekot1
+    procedure ExtractItemToPath(const item: Cardinal; const path: string; test: longbool); stdcall;
     procedure ExtractItems(items: PCardArray; count: cardinal; test: longbool;
       sender: pointer; callback: T7zGetStreamCallBack); stdcall;
     procedure ExtractAll(test: longbool; sender: pointer; callback: T7zGetStreamCallBack); stdcall;
@@ -793,7 +809,9 @@ CODER_INTERFACE(ICompressSetCoderProperties, 0x21)
     property ItemSize[const index: integer]: Int64 read GetItemSize;
     //fix by flying wang.
     property ItemCompressedSize[const index: integer]: Int64 read GetItemCompressedSize;
+{$IFDEF MSWINDOWS}
     property ItemFileTime[const index: integer]: TFileTime read GetItemFileTime;
+{$ENDIF MSWINDOWS}
     property ItemDataTime[const index: integer]: TDateTime read GetItemDataTime;
     property ItemIsFolder[const index: integer]: boolean read GetItemIsFolder;
     property InArchive: IInArchive read GetInArchive;
@@ -868,15 +886,24 @@ type
   procedure SevenZipEncryptHeaders(Arch: I7zOutArchive; Encrypt: boolean);                    //       X
   procedure SevenZipVolumeMode(Arch: I7zOutArchive; Mode: boolean);                           //       X
 
+{$IFDEF MSWINDOWS}
   // filetime util functions
   function DateTimeToFileTime(dt: TDateTime): TFileTime;
   function FileTimeToDateTime(ft: TFileTime): TDateTime;
   function CurrentFileTime: TFileTime;
+{$ENDIF MSWINDOWS}
 
   // constructors
+const
+{$IFDEF MSWINDOWS}
+  C_7zDllName = '7z.dll';
+{$ENDIF MSWINDOWS}
+{$IFDEF POSIX}
+  C_7zDllName = 'lib7z.so';
+{$ENDIF POSIX}
 
-  function CreateInArchive(const classid: TGUID; const lib: string = '7z.dll'): I7zInArchive;
-  function CreateOutArchive(const classid: TGUID; const lib: string = '7z.dll'): I7zOutArchive;
+  function CreateInArchive(const classid: TGUID; const lib: string = C_7zDllName): I7zInArchive;
+  function CreateOutArchive(const classid: TGUID; const lib: string = C_7zDllName): I7zOutArchive;
 
 const
   CLSID_CFormatZip      : TGUID = '{23170F69-40C1-278A-1000-000110010000}'; // [OUT] zip jar xpi
@@ -1001,6 +1028,7 @@ const
   ZipEncryptionMethod: array[TZipEncryptionMethod] of UnicodeString = ('AES128', 'AES192', 'AES256', 'ZIPCRYPTO');
   SevCompressionMethod: array[T7zCompressionMethod] of UnicodeString = ('COPY', 'LZMA', 'BZIP2', 'PPMD', 'DEFLATE', 'DEFLATE64');
 
+{$IFDEF MSWINDOWS}
 function DateTimeToFileTime(dt: TDateTime): TFileTime;
 var
   st: TSystemTime;
@@ -1023,6 +1051,7 @@ function CurrentFileTime: TFileTime;
 begin
   GetSystemTimeAsFileTime(Result);
 end;
+{$ENDIF MSWINDOWS}
 
 procedure RINOK(const hr: HRESULT);
 begin
@@ -1147,6 +1176,50 @@ begin
   SetBooleanProperty(arch, 'V', Mode);
 end;
 
+function LoadModule(FileName: string): THandle;
+{$IFDEF MSWINDOWS}
+begin
+  Result := SafeLoadLibrary(FileName);
+end;
+{$ENDIF MSWINDOWS}
+{$IFDEF POSIX}
+begin
+  Result := dlopen(PChar(FileName), RTLD_NOW);
+end;
+{$ENDIF POSIX}
+
+procedure UnloadModule(var Module: THandle);
+{$IFDEF MSWINDOWS}
+begin
+  if Module <> 0 then
+    FreeLibrary(Module);
+  Module := 0;
+end;
+{$ENDIF MSWINDOWS}
+{$IFDEF POSIX}
+begin
+  if Module <> 0 then
+    dlclose(Pointer(Module));
+  Module := 0;
+end;
+{$ENDIF POSIX}
+
+function GetModuleSymbol(Module: THandle; SymbolName: string): Pointer;
+{$IFDEF MSWINDOWS}
+begin
+  Result := nil;
+  if Module <> 0 then
+    Result := GetProcAddress(Module, PChar(SymbolName));
+end;
+{$ENDIF MSWINDOWS}
+{$IFDEF POSIX}
+begin
+  Result := nil;
+  if Module <> 0 then
+    Result := dlsym(Module, PChar(SymbolName));
+end;
+{$ENDIF POSIX}
+
 type
   T7zPlugin = class(TInterfacedObject)
   private
@@ -1232,10 +1305,14 @@ type
     function GetItemSize(const index: integer): Int64; stdcall; stdcall;
     //fix by flying wang.
     function GetItemCompressedSize(const index: integer): Int64; stdcall;
+{$IFDEF MSWINDOWS}
     function GetItemFileTime(const index: integer): TFileTime; stdcall;
+{$ENDIF MSWINDOWS}
     function GetItemDataTime(const index: integer): TDateTime; stdcall;
     function GetItemIsFolder(const index: integer): boolean; stdcall;
     procedure ExtractItem(const item: Cardinal; Stream: TStream; test: longbool); stdcall;
+    //fix or add by ekot1
+    procedure ExtractItemToPath(const item: Cardinal; const path: string; test: longbool); stdcall;
     procedure ExtractItems(items: PCardArray; count: cardinal; test: longbool; sender: pointer; callback: T7zGetStreamCallBack); stdcall;
     procedure SetPasswordCallback(sender: Pointer; callback: T7zPasswordCallback); stdcall;
     procedure SetProgressCallback(sender: Pointer; callback: T7zProgressCallback); stdcall;
@@ -1328,10 +1405,19 @@ end;
 constructor T7zPlugin.Create(const lib: string);
 begin
   inherited Create;
-  FHandle := LoadLibrary(PChar(lib));
+  FHandle := LoadModule(PChar(lib));
   if FHandle = 0 then
-    raise exception.CreateFmt('Error loading library %s', [lib]);
-  FCreateObject := GetProcAddress(FHandle, 'CreateObject');
+  begin
+    try
+      RaiseLastOSError;
+    except
+      on E: Exception do
+      begin
+        raise Exception.CreateFmt('Error loading library %s', [lib] + sLineBreak + 'Error Message: ' + E.Message);
+      end;
+    end;
+  end;
+  FCreateObject := GetModuleSymbol(FHandle, 'CreateObject');
   if not (Assigned(FCreateObject)) then
   begin
     FreeLibrary(FHandle);
@@ -1341,7 +1427,7 @@ end;
 
 destructor T7zPlugin.Destroy;
 begin
-  FreeLibrary(FHandle);
+  UnloadModule(FHandle);
   inherited;
 end;
 
@@ -1359,8 +1445,8 @@ end;
 constructor T7zCodec.Create(const lib: string);
 begin
   inherited;
-  FGetMethodProperty := GetProcAddress(FHandle, 'GetMethodProperty');
-  FGetNumberOfMethods := GetProcAddress(FHandle, 'GetNumberOfMethods');
+  FGetMethodProperty := GetModuleSymbol(FHandle, 'GetMethodProperty');
+  FGetNumberOfMethods := GetModuleSymbol(FHandle, 'GetNumberOfMethods');
   if not (Assigned(FGetMethodProperty) and Assigned(FGetNumberOfMethods)) then
   begin
     FreeLibrary(FHandle);
@@ -1518,6 +1604,19 @@ begin
     FStream := nil;
   end;
 end;
+
+//fix or add by ekot1
+procedure T7zInArchive.ExtractItemToPath(const item: Cardinal; const path: string; test: longbool); stdcall;
++begin
+ +  FExtractPath := IncludeTrailingPathDelimiter(path);
+ +  try
+ +    if test then
+ +      RINOK(FInArchive.Extract(@item, 1, 1, self as IArchiveExtractCallback)) else
+ +      RINOK(FInArchive.Extract(@item, 1, 0, self as IArchiveExtractCallback));
+ +  finally
+ +    FExtractPath := '';
+ +  end;
+ +end;
 
 function T7zInArchive.GetStream(index: Cardinal;
   var outStream: ISequentialOutStream; askExtractMode: NAskMode): HRESULT;
@@ -1707,6 +1806,7 @@ begin
   Result := Int64(GetItemProp(index, kpidPackSize));
 end;
 
+{$IFDEF MSWINDOWS}
 function T7zInArchive.GetItemFileTime(const index: integer): TFileTime; stdcall;
 var
   value: OleVariant;
@@ -1717,6 +1817,7 @@ begin
     Result := TPropVariant(value).filetime;
   end;
 end;
+{$ENDIF MSWINDOWS}
 
 function T7zInArchive.GetItemDataTime(const index: integer): TDateTime; stdcall;
 var
@@ -1793,7 +1894,7 @@ end;
 constructor T7zArchive.Create(const lib: string);
 begin
   inherited;
-  FGetHandlerProperty := GetProcAddress(FHandle, 'GetHandlerProperty');
+  FGetHandlerProperty := GetModuleSymbol(FHandle, 'GetHandlerProperty');
   if not Assigned(FGetHandlerProperty) then
   begin
     FreeLibrary(FHandle);
