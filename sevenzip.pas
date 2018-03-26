@@ -1413,7 +1413,7 @@ begin
     except
       on E: Exception do
       begin
-        raise Exception.CreateFmt('Error loading library %s', [lib] + sLineBreak + 'Error Message: ' + E.Message);
+        raise Exception.CreateFmt('Error loading library %s' + sLineBreak + 'Error Message: ' + E.Message, [lib]);
       end;
     end;
   end;
@@ -1607,16 +1607,16 @@ end;
 
 //fix or add by ekot1
 procedure T7zInArchive.ExtractItemToPath(const item: Cardinal; const path: string; test: longbool); stdcall;
-+begin
- +  FExtractPath := IncludeTrailingPathDelimiter(path);
- +  try
- +    if test then
- +      RINOK(FInArchive.Extract(@item, 1, 1, self as IArchiveExtractCallback)) else
- +      RINOK(FInArchive.Extract(@item, 1, 0, self as IArchiveExtractCallback));
- +  finally
- +    FExtractPath := '';
- +  end;
- +end;
+begin
+  FExtractPath := IncludeTrailingPathDelimiter(path);
+  try
+    if test then
+      RINOK(FInArchive.Extract(@item, 1, 1, self as IArchiveExtractCallback)) else
+      RINOK(FInArchive.Extract(@item, 1, 0, self as IArchiveExtractCallback));
+  finally
+    FExtractPath := '';
+  end;
+end;
 
 function T7zInArchive.GetStream(index: Cardinal;
   var outStream: ISequentialOutStream; askExtractMode: NAskMode): HRESULT;
