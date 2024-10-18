@@ -1354,8 +1354,8 @@ begin
   FStream := Stream;
   try
     if test then
-      RINOK(FInArchive.Extract(@item, 1, 1, self as IArchiveExtractCallback)) else
-      RINOK(FInArchive.Extract(@item, 1, 0, self as IArchiveExtractCallback));
+      RINOK(FInArchive.Extract(PCardArray(@item), 1, 1, self as IArchiveExtractCallback)) else
+      RINOK(FInArchive.Extract(PCardArray(@item), 1, 0, self as IArchiveExtractCallback));
   finally
     FStream := nil;
   end;
